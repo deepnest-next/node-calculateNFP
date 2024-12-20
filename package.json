@@ -1,0 +1,29 @@
+{
+  "name": "calculatenfp",
+  "version": "0.1.0",
+  "description": "C++ Addon for calculating NFP using by @deepnest-next/deepnest",
+  "license": "MIT",
+  "scripts": {
+    "install": "node-gyp-build"
+  },
+  "repository": "https://github.com/deepnest-next/node-calculateNFP",
+  "keywords": [
+    "Electron",
+    "Nesting",
+    "CNC",
+    "Laser"
+  ],
+  "contributors": [
+    {
+      "name": "Josef Fröhle",
+      "email": "github@josef-froehle.de"
+    }
+  ],
+  "dependencies": {
+    "nan": "^2.22.0",
+    "node-gyp-build": "^4.8.4"
+  },
+  "devDependencies": {
+    "prebuildify": "^6.0.1"
+  }
+}
