@@ -1,0 +1,58 @@
+name: Build
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  NODE_VERSION: 20.18.1
+  ELECTRON_VERSION: 32.2.7
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macOS-latest]
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: clone repository
+        uses: actions/checkout@v4
+
+      - name: install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: install dependencies
+        run: npm install
+
+      - name: run build script for windows
+        if: startsWith(matrix.os,'windows')
+        shell: powershell
+        run: |
+          npx prebuildify -t ${{ env.NODE_VERSION }} -t electron@${{ env.ELECTRON_VERSION }} --napi=false --tag-uv --tag-armv --tag-libc --strip --arch ia32
+          npx prebuildify -t ${{ env.NODE_VERSION }} -t electron@${{ env.ELECTRON_VERSION }}  --napi=false --tag-uv --tag-armv --tag-libc --strip --arch x64
+          npx prebuildify -t ${{ env.NODE_VERSION }} -t electron@${{ env.ELECTRON_VERSION }}  --napi=false --tag-uv --tag-armv --tag-libc --strip --arch arm64
+
+      - name: run build script for ubuntu
+        if: startsWith(matrix.os,'ubuntu')
+        shell: bash
+        run: |
+          npx prebuildify -t ${{ env.NODE_VERSION }} -t electron@${{ env.ELECTRON_VERSION }}  --napi=false --tag-uv --tag-armv --tag-libc --strip --arch x64
+          npx prebuildify -t ${{ env.NODE_VERSION }} -t electron@${{ env.ELECTRON_VERSION }}  --napi=false --tag-uv --tag-armv --tag-libc --strip --arch arm64
+
+      # - name: run build script for macOS
+      #   if: startsWith(matrix.os,'macOS')
+      #   shell: bash
+      #   run: |
+      #     npx prebuildify -t ${{ env.NODE_VERSION }} -t electron@${{ env.ELECTRON_VERSION }}  --napi=false --tag-uv --tag-armv --tag-libc --strip --arch universal
+      #     npx prebuildify -t ${{ env.NODE_VERSION }} -t electron@${{ env.ELECTRON_VERSION }}  --napi=false --tag-uv --tag-armv --tag-libc --strip --arch x64
+      #     npx prebuildify -t ${{ env.NODE_VERSION }} -t electron@${{ env.ELECTRON_VERSION }}  --napi=false --tag-uv --tag-armv --tag-libc --strip --arch arm64
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-${{ matrix.os }}
+          path: prebuilds/*
