@@ -1,5 +1,7 @@
 # node-calculatenfp
 
+:warning: work in progress
+
 This is one of the core libs of deepnest.
 
 It will be build only for the version we currently need and support.
