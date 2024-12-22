@@ -92,9 +92,9 @@ jobs:
           path: prebuilds/*
 
   update-version-and-release:
-    needs: build
+    needs: [compute-shasum, build]
+    if: ${{ needs.compute-shasum.result == 'failure' && needs.build.result == 'success' }}
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -135,6 +135,7 @@ jobs:
           merge-multiple: true
 
       - name: Create GitHub Release
+        if: github.ref == 'refs/heads/main'
         uses: softprops/action-gh-release@v2
         with:
           tag_name: "v${{ env.new_version }}"
@@ -152,12 +153,14 @@ jobs:
             .last-shasum
 
       - name: Publish to npm
+        if: github.ref == 'refs/heads/main'
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
           registry-url: "https://registry.npmjs.org/"
 
       - name: Publish Package
+        if: github.ref == 'refs/heads/main'
         run: npm publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
