@@ -2,12 +2,19 @@ name: Build
 
 on:
   workflow_dispatch:
-  # push:
-  #   branches:
-  #     - main
+    inputs:
+      node_version:
+        description: "Node.js Version"
+        required: false
+        default: "20.18.1"
+      electron_version:
+        description: "Electron Version"
+        required: false
+        default: "32.2.7"
+
 env:
-  NODE_VERSION: 20.18.1
-  ELECTRON_VERSION: 32.2.7
+  NODE_VERSION: ${{ inputs.node_version || '20.18.1' }}
+  ELECTRON_VERSION: ${{ inputs.electron_version || '32.2.7' }}
 
 jobs:
   build:
@@ -53,3 +60,67 @@ jobs:
         with:
           name: release-${{ matrix.os }}
           path: prebuilds/*
+
+  update-version-and-release:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Bump Version
+        id: bump_version
+        run: |
+          # Extract current version
+          CURRENT_VERSION=$(node -p "require('./package.json').version")
+          echo "Current version: $CURRENT_VERSION"
+
+          # Increment version (patch bump by default, you can modify to 'minor' or 'major')
+          NEW_VERSION=$(npx semver $CURRENT_VERSION -i patch)
+          echo "New version: $NEW_VERSION"
+
+          # Update package.json with new version
+          npm version $NEW_VERSION --no-git-tag-version
+
+          # Output new version for use in subsequent steps
+          echo "new_version=$NEW_VERSION" >> $GITHUB_ENV
+
+      - name: Commit Updated Version
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add package.json
+          git commit -m "chore: update version to ${{ env.new_version }}"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Push Changes
+        run: git push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create GitHub Release
+        uses: actions/create-release@v1
+        with:
+          tag_name: "v${{ env.new_version }}"
+          release_name: "Release v${{ env.new_version }}"
+          body: |
+            ## Changes
+            - Automatic version bump to v${{ env.new_version }}.
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Publish to npm
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          registry-url: "https://registry.npmjs.org/"
+
+      - name: Login to npm
+        run: echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
+
+      - name: Publish Package
+        run: npm publish
