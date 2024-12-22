@@ -6,7 +6,10 @@
   "scripts": {
     "install": "node-gyp-build"
   },
-  "repository": "https://github.com/deepnest-next/node-calculateNFP",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/deepnest-next/node-calculateNFP.git"
+  },
   "keywords": [
     "Electron",
     "deepnest-next",
