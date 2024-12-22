@@ -45,9 +45,12 @@ jobs:
             exit 1
           fi
 
+    outputs:
+      status: ${{ steps.check-shasum.outcome }}
+
   build:
     needs: compute-shasum
-    if: ${{ needs.compute-shasum.result == 'failure' }}
+    if: ${{ needs.compute-shasum.outputs.status == 'failure' }}
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest, macOS-latest]
@@ -94,7 +97,7 @@ jobs:
 
   update-version-and-release:
     needs: [compute-shasum, build]
-    if: ${{ needs.compute-shasum.result == 'failure' && needs.build.result == 'success' }}
+    if: ${{ needs.compute-shasum.outputs.status == 'failure' && needs.build.result == 'success' }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
