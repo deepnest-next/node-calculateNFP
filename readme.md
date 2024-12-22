@@ -6,8 +6,6 @@ This is one of the core libs of deepnest.
 
 It will be build only for the version we currently need and support.
 
-
-
 ### Build on Windows:
 
 You need the latest Version of `Visual Studio` at this moment 2022.
