@@ -1,0 +1,9 @@
+node_modules/
+.github/
+.gitignore
+.vscode/
+.git/
+.idea/
+.npmignore
+build-*
+package-lock.json
