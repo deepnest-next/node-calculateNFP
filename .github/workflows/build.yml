@@ -19,6 +19,7 @@ env:
 jobs:
   compute-shasum:
     runs-on: ubuntu-latest
+    continue-on-error: true
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -46,7 +47,7 @@ jobs:
 
   build:
     needs: compute-shasum
-    if: failure()
+    if: ${{ needs.compute-shasum.result == 'failure' }}
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest, macOS-latest]
