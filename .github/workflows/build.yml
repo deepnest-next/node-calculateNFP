@@ -17,7 +17,37 @@ env:
   ELECTRON_VERSION: ${{ inputs.electron_version || '32.2.7' }}
 
 jobs:
+  compute-shasum:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Compute Sorted SHASUM
+        id: compute-shasum
+        run: |
+          # Generate SHASUM for all relevant files and sort them
+          chmod +x ./create-shasum.sh
+          ./create-shasum.sh
+
+          # Output the current SHASUM for the environment
+          echo "shasum256save=$(cat sha256.txt)" >> $GITHUB_ENV
+
+      - name: Check for Existing SHASUM
+        id: check-shasum
+        run: |
+          if [ -f ./.last-shasum ]; then
+            echo "Previous SHASUM exists."
+            diff sha256.txt ./.last-shasum > /dev/null || exit 1
+          else
+            echo "No previous SHASUM found."
+            exit 1
+          fi
+        continue-on-error: true
+
   build:
+    needs: compute-shasum
+    if: failure()
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest, macOS-latest]
@@ -85,9 +115,10 @@ jobs:
 
       - name: Commit Updated Version
         run: |
+          echo "${{ env.shasum256save }}" > .last-shasum
           git config user.name "github-actions"
           git config user.email "actions@github.com"
-          git add package.json
+          git add package.json .last-shasum
           git commit -m "chore: update version to ${{ env.new_version }}"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -105,17 +136,21 @@ jobs:
           merge-multiple: true
 
       - name: Create GitHub Release
-        uses: actions/create-release@v1
+        uses: softprops/action-gh-release@v2
         with:
           tag_name: "v${{ env.new_version }}"
-          release_name: "Release v${{ env.new_version }}"
+          name: "Release v${{ env.new_version }}"
           body: |
             ## Changes
             - Automatic version bump to v${{ env.new_version }}.
+            - Automatic prebuilds for all platforms and architectures that use the Node.js in version ${{ env.NODE_VERSION }} and Electron in version ${{ env.ELECTRON_VERSION }}.
           draft: false
           prerelease: false
-        env:
-          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
+          token: ${{ secrets.PAT_TOKEN }}
+          make_latest: true
+          files: |
+            prebuilds/*
+            .last-shasum
 
       - name: Publish to npm
         uses: actions/setup-node@v4
