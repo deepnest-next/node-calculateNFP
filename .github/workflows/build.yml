@@ -72,15 +72,8 @@ jobs:
       - name: Bump Version
         id: bump_version
         run: |
-          # Extract current version
-          CURRENT_VERSION=$(node -p "require('./package.json').version")
-          echo "Current version: $CURRENT_VERSION"
-
-          # Increment version (patch bump by default, you can modify to 'minor' or 'major')
-          NEW_VERSION=$(npx semver $CURRENT_VERSION -i patch)
+          NEW_VERSION=$(date -u +"%Y%m.%d.%H%M%S") 
           echo "New version: $NEW_VERSION"
-
-          # Update package.json with new version
           npm version $NEW_VERSION --no-git-tag-version
 
           # Output new version for use in subsequent steps
@@ -99,6 +92,13 @@ jobs:
         run: git push
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Download All Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: prebuilds
+          pattern: release-*
+          merge-multiple: true
 
       - name: Create GitHub Release
         uses: actions/create-release@v1
