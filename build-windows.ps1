@@ -11,4 +11,4 @@ npm install
 
 npx prebuildify -t $env:NODE_VERSION -t electron@$env:ELECTRON_VERSION --napi=false --tag-uv --tag-armv --tag-libc --strip --arch ia32
 npx prebuildify -t $env:NODE_VERSION -t electron@$env:ELECTRON_VERSION --napi=false --tag-uv --tag-armv --tag-libc --strip --arch x64
-npx prebuildify -t $env:NODE_VERSION -t electron@$env:ELECTRON_VERSION --napi=false --tag-uv --tag-armv --tag-libc --strip --arch arm64
+#npx prebuildify -t $env:NODE_VERSION -t electron@$env:ELECTRON_VERSION --napi=false --tag-uv --tag-armv --tag-libc --strip --arch arm64
