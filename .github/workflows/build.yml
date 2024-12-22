@@ -39,7 +39,7 @@ jobs:
         if: startsWith(matrix.os,'windows')
         shell: powershell
         run: |
-          build-windows.ps1
+          .\build-windows.ps1
 
       - name: run build script for ubuntu
         if: startsWith(matrix.os,'ubuntu')
@@ -86,12 +86,12 @@ jobs:
           git add package.json
           git commit -m "chore: update version to ${{ env.new_version }}"
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
 
       - name: Push Changes
         run: git push
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
 
       - name: Download All Artifacts
         uses: actions/download-artifact@v4
@@ -111,7 +111,7 @@ jobs:
           draft: false
           prerelease: false
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
 
       - name: Publish to npm
         uses: actions/setup-node@v4
