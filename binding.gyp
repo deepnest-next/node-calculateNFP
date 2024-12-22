@@ -11,7 +11,7 @@
       "conditions": [
         [
           'OS=="win"', {
-            "msvs_version":2022,
+            "msvs_version": 2022,
             
             "conditions": [
               [
@@ -26,9 +26,6 @@
                   "cflags!": ["-fno-exceptions", "-m64"],
                   "ldflags": ["-m elf_x86_64"],
                   "defines": ["NOMINMAX"],
-                  "libraries": [
-                    "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\lib\\<(target_arch)\\delayimp.lib"
-                  ],
                 }
               ],
               [
