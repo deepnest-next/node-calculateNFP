@@ -1,3 +1,6 @@
+whoami
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File ./build-windows-install.ps1
+
 Remove-Item -ErrorAction SilentlyContinue -Recurse -Force .\node_modules\, .\build\, .\prebuilds\, .\package-lock.json
 
 # Hol die aktuelle Version von Node.js
