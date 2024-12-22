@@ -15,7 +15,7 @@ npm install
 
 # Führe prebuildify mit den gewünschten Optionen aus
 # npx prebuildify -t "$NODE_VERSION" -t "electron@$ELECTRON_VERSION" --napi=false --tag-uv --tag-armv --tag-libc --strip --arch ia32
-npx prebuildify -t "$NODE_VERSION" -t "electron@$ELECTRON_VERSION" --napi=false --tag-uv --tag-armv --tag-libc --strip --arch x64
-npx prebuildify -t "$NODE_VERSION" -t "electron@$ELECTRON_VERSION" --napi=true --tag-uv --tag-armv --tag-libc --strip --arch x64
-npx prebuildify -t "$NODE_VERSION" -t "electron@$ELECTRON_VERSION" --napi=false --tag-uv --tag-armv --tag-libc --strip --arch arm64
-npx prebuildify -t "$NODE_VERSION" -t "electron@$ELECTRON_VERSION" --napi=true --tag-uv --tag-armv --tag-libc --strip --arch arm64
+npx prebuildify -t "$NODE_VERSION" -t "electron@$ELECTRON_VERSION" --napi=false --tag-uv --tag-armv --tag-libc --strip -n calculateNfp --arch x64
+npx prebuildify -t "$NODE_VERSION" -t "electron@$ELECTRON_VERSION" --napi=true --tag-uv --tag-armv --tag-libc --strip -n calculateNfp --arch x64
+npx prebuildify -t "$NODE_VERSION" -t "electron@$ELECTRON_VERSION" --napi=false --tag-uv --tag-armv --tag-libc --strip -n calculateNfp --arch arm64
+npx prebuildify -t "$NODE_VERSION" -t "electron@$ELECTRON_VERSION" --napi=true --tag-uv --tag-armv --tag-libc --strip -n calculateNfp --arch arm64
