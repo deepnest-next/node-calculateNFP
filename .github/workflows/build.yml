@@ -43,7 +43,6 @@ jobs:
             echo "No previous SHASUM found."
             exit 1
           fi
-        continue-on-error: true
 
   build:
     needs: compute-shasum
