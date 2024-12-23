@@ -39,6 +39,11 @@ jobs:
         run: |
           if [ -f ./.last-shasum ]; then
             echo "Previous SHASUM exists."
+            echo "------"
+            cat sha256.txt
+            echo "------"
+            cat .last-shasum
+            echo "------"
             diff sha256.txt ./.last-shasum > /dev/null || exit 1
           else
             echo "No previous SHASUM found."
