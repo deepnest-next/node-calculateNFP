@@ -33,6 +33,7 @@ jobs:
 
           # Output the current SHASUM for the environment
           echo "shasum256save=$(cat sha256.txt)" >> $GITHUB_ENV
+          echo "shasum256save=$(cat sha256.txt)" >> "$GITHUB_OUTPUT"
 
       - name: Check for Existing SHASUM
         id: check-shasum
@@ -52,6 +53,7 @@ jobs:
 
     outputs:
       status: ${{ steps.check-shasum.outcome }}
+      shasum256save: ${{ steps.compute-shasum.outputs.shasum256save }}
 
   build:
     needs: compute-shasum
@@ -123,7 +125,7 @@ jobs:
 
       - name: Commit Updated Version
         run: |
-          echo "${{ env.shasum256save }}" > .last-shasum
+          echo "${{ needs.compute-shasum.outputs.shasum256save }}" > .last-shasum
           git config user.name "github-actions"
           git config user.email "actions@github.com"
           git add package.json .last-shasum
