@@ -3,5 +3,3 @@ build/
 dist/
 package-lock.json
 prebuilds/
-.github/
-.vscode/
