@@ -11,8 +11,7 @@
       "conditions": [
         [
           'OS=="win"', {
-            "msvs_version":2022,
-            
+            "msvs_version": 2022,
             "conditions": [
               [
                 'target_arch=="ia32"', {
@@ -28,7 +27,7 @@
                   "defines": ["NOMINMAX"],
                   "libraries": [
                     "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\lib\\<(target_arch)\\delayimp.lib"
-                  ],
+                  ]
                 }
               ],
               [
@@ -50,9 +49,14 @@
         ]
       ],
       "include_dirs": [
-        "<!(node -e \"require('nan')\")",
-        "./src/polygon/include"
-      ]
+        "<!(node -e \"require('node-addon-api').include\")",
+        "./src/polygon/include/boost/polygon/*.hpp",
+        "./src/polygon/include/boost/polygon/detail/*.hpp",
+      ],
+      
+      'dependencies': [
+        "<!(node -p \"require('node-addon-api').targets\"):node_addon_api",
+      ],
     }
   ]
 }
