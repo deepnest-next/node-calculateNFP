@@ -127,8 +127,8 @@ Napi::Value calculateNFP(const Napi::CallbackInfo& info) {
     // Carica i punti di A
     for (unsigned int i = 0; i < A_points.Length(); i++) {
         Napi::Object obj = A_points.Get(i).As<Napi::Object>();
-        int x = static_cast<int>(inputscale * obj.Get("x").ToNumber().DoubleValue());
-        int y = static_cast<int>(inputscale * obj.Get("y").ToNumber().DoubleValue());
+        int x = static_cast<int>(inputscale * obj.Get("X").ToNumber().DoubleValue());
+        int y = static_cast<int>(inputscale * obj.Get("Y").ToNumber().DoubleValue());
         pts.push_back(point(x, y));
     }
 
@@ -142,8 +142,8 @@ Napi::Value calculateNFP(const Napi::CallbackInfo& info) {
         pts.clear();
         for (unsigned int j = 0; j < hole.Length(); j++) {
             Napi::Object obj = hole.Get(j).As<Napi::Object>();
-            int x = static_cast<int>(inputscale * obj.Get("x").ToNumber().DoubleValue());
-            int y = static_cast<int>(inputscale * obj.Get("y").ToNumber().DoubleValue());
+            int x = static_cast<int>(inputscale * obj.Get("X").ToNumber().DoubleValue());
+            int y = static_cast<int>(inputscale * obj.Get("Y").ToNumber().DoubleValue());
             pts.push_back(point(x, y));
         }
         boost::polygon::set_points(poly, pts.begin(), pts.end());
@@ -155,13 +155,13 @@ Napi::Value calculateNFP(const Napi::CallbackInfo& info) {
     double xshift = 0, yshift = 0;
     for (unsigned int i = 0; i < B.Length(); i++) {
         Napi::Object obj = B.Get(i).As<Napi::Object>();
-        int x = -static_cast<int>(inputscale * obj.Get("x").ToNumber().DoubleValue());
-        int y = -static_cast<int>(inputscale * obj.Get("y").ToNumber().DoubleValue());
+        int x = -static_cast<int>(inputscale * obj.Get("X").ToNumber().DoubleValue());
+        int y = -static_cast<int>(inputscale * obj.Get("Y").ToNumber().DoubleValue());
         pts.push_back(point(x, y));
 
         if (i == 0) {
-            xshift = obj.Get("x").ToNumber().DoubleValue();
-            yshift = obj.Get("y").ToNumber().DoubleValue();
+            xshift = obj.Get("X").ToNumber().DoubleValue();
+            yshift = obj.Get("Y").ToNumber().DoubleValue();
         }
     }
 
