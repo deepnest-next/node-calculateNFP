@@ -1,11 +1,11 @@
 #include <napi.h>
 
-Napi::Value CalculateNFP(const Napi::CallbackInfo& info);
+Napi::Value calculateNFP(const Napi::CallbackInfo& info);
 
 Napi::Object Init(Napi::Env env, Napi::Object exports) {
   exports.Set(
     Napi::String::New(env, "calculateNFP"),
-    Napi::Function::New(env, CalculateNFP)
+    Napi::Function::New(env, calculateNFP)
   );
 
   return exports;
