@@ -94,110 +94,113 @@ void convolve_two_polygon_sets(polygon_set& result, const polygon_set& a, const 
 double inputscale;
 
 Napi::Value calculateNFP(const Napi::CallbackInfo& info) {
-    Napi::Env env = info.Env();
-    Napi::Object group = info[0].As<Napi::Object>();
-    Napi::Array A = group.Get("A").As<Napi::Array>();
-    Napi::Array B = group.Get("B").As<Napi::Array>();
+  Napi::Env env = info.Env();
+  Napi::Object group = info[0].As<Napi::Object>();
+  Napi::Array A = group.Get("A").As<Napi::Array>();
+  Napi::Array B = group.Get("B").As<Napi::Array>();
 
-    // Verifica se il poligono A ha buchi
-    bool hasHoles = group.Get("hasHoles").ToBoolean();
-    Napi::Array holes;
-    if (hasHoles) {
-        holes = group.Get("children").As<Napi::Array>();
-    } else {
-        holes = Napi::Array::New(env);
-    }
+  // Verifica se il poligono A ha buchi
+  bool hasHoles = group.Get("hasHoles").ToBoolean();
+  Napi::Array holes;
+  if (hasHoles) {
+    holes = group.Get("children").As<Napi::Array>();
+  } else {
+    holes = Napi::Array::New(env);
+  }
 
-    polygon_set a, b, c;
-    std::vector<polygon> polys;
-    std::vector<point> pts;
+  polygon_set a, b, c;
+  std::vector<polygon> polys;
+  std::vector<point> pts;
 
-    double maxda = 1.0;
-    inputscale = (0.1 * std::numeric_limits<int>::max()) / maxda;
+  double maxda = 1.0;
+  inputscale = (0.1 * std::numeric_limits<int>::max()) / maxda;
 
-    // Carica i punti di A
-    for (unsigned int i = 0; i < A.Length(); i++) {
-        Napi::Object obj = A.Get(i).As<Napi::Object>();
+  // Carica i punti di A
+  for (unsigned int i = 0; i < A.Length(); i++) {
+    Napi::Object obj = A.Get(i).As<Napi::Object>();
+    int x = static_cast<int>(inputscale * obj.Get("X").ToNumber().DoubleValue());
+    int y = static_cast<int>(inputscale * obj.Get("Y").ToNumber().DoubleValue());
+    pts.push_back(point(x, y));
+  }
+
+  polygon poly;
+  boost::polygon::set_points(poly, pts.begin(), pts.end());
+  a += poly;
+
+  // Carica i buchi di A (se presenti)
+  if(hasHoles) {
+    for (unsigned int i = 0; i < holes.Length(); i++) {
+      Napi::Array hole = holes.Get(i).As<Napi::Array>();
+      pts.clear();
+      for (unsigned int j = 0; j < hole.Length(); j++) {
+        Napi::Object obj = hole.Get(j).As<Napi::Object>();
         int x = static_cast<int>(inputscale * obj.Get("X").ToNumber().DoubleValue());
         int y = static_cast<int>(inputscale * obj.Get("Y").ToNumber().DoubleValue());
         pts.push_back(point(x, y));
+      }
+      boost::polygon::set_points(poly, pts.begin(), pts.end());
+      a -= poly; // Sottrae il buco dal poligono principale
+    }
+  }
+
+  // Carica i punti di B
+  pts.clear();
+  double xshift = 0, yshift = 0;
+  for (unsigned int i = 0; i < B.Length(); i++) {
+    Napi::Object obj = B.Get(i).As<Napi::Object>();
+    int x = -static_cast<int>(inputscale * obj.Get("X").ToNumber().DoubleValue());
+    int y = -static_cast<int>(inputscale * obj.Get("Y").ToNumber().DoubleValue());
+    pts.push_back(point(x, y));
+    if (i == 0) {
+      xshift = obj.Get("X").ToNumber().DoubleValue();
+      yshift = obj.Get("Y").ToNumber().DoubleValue();
+    }
+  }
+
+  boost::polygon::set_points(poly, pts.begin(), pts.end());
+  b += poly;
+
+  // Calcola la convoluzione
+  polys.clear();
+  convolve_two_polygon_sets(c, a, b);
+  c.get(polys);
+
+  // Costruisci il risultato
+  Napi::Array result_list = Napi::Array::New(env, polys.size());
+  for (unsigned int i = 0; i < polys.size(); ++i) {
+    Napi::Array pointlist = Napi::Array::New(env);
+    int j = 0;
+
+    for (auto itr = polys[i].begin(); itr != polys[i].end(); ++itr) {
+      Napi::Object p = Napi::Object::New(env);
+      p.Set("x", Napi::Number::New(env, ((double)(*itr).x()) / inputscale + xshift));
+      p.Set("y", Napi::Number::New(env, ((double)(*itr).y()) / inputscale + yshift));
+      pointlist.Set(j, p);
+      j++;
     }
 
-    polygon poly;
-    boost::polygon::set_points(poly, pts.begin(), pts.end());
-    a += poly;
-
-    // Carica i buchi di A (se presenti)
-    for (unsigned int i = 0; i < holes.Length(); i++) {
-        Napi::Array hole = holes.Get(i).As<Napi::Array>();
-        pts.clear();
-        for (unsigned int j = 0; j < hole.Length(); j++) {
-            Napi::Object obj = hole.Get(j).As<Napi::Object>();
-            int x = static_cast<int>(inputscale * obj.Get("X").ToNumber().DoubleValue());
-            int y = static_cast<int>(inputscale * obj.Get("Y").ToNumber().DoubleValue());
-            pts.push_back(point(x, y));
+    // Aggiungi i buchi (se presenti)
+    Napi::Array children = Napi::Array::New(env);
+    if(hasHoles) {
+      int k = 0;
+      for (auto itrh = polys[i].begin_holes(); itrh != polys[i].end_holes(); ++itrh) {
+        Napi::Array child = Napi::Array::New(env);
+        int z = 0;
+        for (auto itr2 = (*itrh).begin(); itr2 != (*itrh).end(); ++itr2) {
+          Napi::Object localC = Napi::Object::New(env);
+          localC.Set("X", Napi::Number::New(env, ((double)(*itr2).x()) / inputscale + xshift));
+          localC.Set("Y", Napi::Number::New(env, ((double)(*itr2).y()) / inputscale + yshift));
+          child.Set(z, localC);
+          z++;
         }
-        boost::polygon::set_points(poly, pts.begin(), pts.end());
-        a -= poly; // Sottrae il buco dal poligono principale
+        children.Set(k, child);
+        k++;
+      }
     }
 
-    // Carica i punti di B
-    pts.clear();
-    double xshift = 0, yshift = 0;
-    for (unsigned int i = 0; i < B.Length(); i++) {
-        Napi::Object obj = B.Get(i).As<Napi::Object>();
-        int x = -static_cast<int>(inputscale * obj.Get("X").ToNumber().DoubleValue());
-        int y = -static_cast<int>(inputscale * obj.Get("Y").ToNumber().DoubleValue());
-        pts.push_back(point(x, y));
+    pointlist.Set("children", children);
+    result_list.Set(i, pointlist);
+  }
 
-        if (i == 0) {
-            xshift = obj.Get("X").ToNumber().DoubleValue();
-            yshift = obj.Get("Y").ToNumber().DoubleValue();
-        }
-    }
-
-    boost::polygon::set_points(poly, pts.begin(), pts.end());
-    b += poly;
-
-    // Calcola la convoluzione
-    polys.clear();
-    convolve_two_polygon_sets(c, a, b);
-    c.get(polys);
-
-    // Costruisci il risultato
-    Napi::Array result_list = Napi::Array::New(env, polys.size());
-    for (unsigned int i = 0; i < polys.size(); ++i) {
-        Napi::Array pointlist = Napi::Array::New(env);
-        int j = 0;
-
-        for (auto itr = polys[i].begin(); itr != polys[i].end(); ++itr) {
-            Napi::Object p = Napi::Object::New(env);
-            p.Set("x", Napi::Number::New(env, ((double)(*itr).x()) / inputscale + xshift));
-            p.Set("y", Napi::Number::New(env, ((double)(*itr).y()) / inputscale + yshift));
-            pointlist.Set(j, p);
-            j++;
-        }
-
-        // Aggiungi i buchi (se presenti)
-        Napi::Array children = Napi::Array::New(env);
-        int k = 0;
-        for (auto itrh = polys[i].begin_holes(); itrh != polys[i].end_holes(); ++itrh) {
-            Napi::Array child = Napi::Array::New(env);
-            int z = 0;
-            for (auto itr2 = (*itrh).begin(); itr2 != (*itrh).end(); ++itr2) {
-                Napi::Object localC = Napi::Object::New(env);
-                localC.Set("x", Napi::Number::New(env, ((double)(*itr2).x()) / inputscale + xshift));
-                localC.Set("y", Napi::Number::New(env, ((double)(*itr2).y()) / inputscale + yshift));
-                child.Set(z, localC);
-                z++;
-            }
-            children.Set(k, child);
-            k++;
-        }
-
-        pointlist.Set("children", children);
-        result_list.Set(i, pointlist);
-    }
-
-    return result_list;
+  return result_list;
 }
