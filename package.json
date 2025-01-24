@@ -4,9 +4,7 @@
   "license": "MIT",
   "scripts": {
     "build": "node-gyp rebuild",
-    "test": "node testing.js",
-    "install": "node-gyp-build",
-    "prebuild": "prebuildify --napi --strip"
+    "test": "node testing.js"
   },
   "keywords": [
     "Nesting",
