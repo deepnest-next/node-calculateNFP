@@ -170,8 +170,8 @@ class axis_transformation {
     bool bit2 = (atr_ & 4) != 0;
     bool bit1 = (atr_ & 2) != 0;
     bool bit0 = (atr_ & 1) != 0;
-    axis_array[1] = (INDIVIDUAL_AXIS)(((int)(!bit2) << 1) + bit1);
-    axis_array[0] = (INDIVIDUAL_AXIS)(((int)(bit2) << 1) + bit0);
+    axis_array[1] = (INDIVIDUAL_AXIS)(((static_cast<int>(!bit2)) << 1) + static_cast<int>(bit1));
+    axis_array[0] = (INDIVIDUAL_AXIS)(((static_cast<int>(bit2)) << 1) + static_cast<int>(bit0));
   }
 
   // it is recommended that the directions stored in an array

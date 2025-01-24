@@ -194,10 +194,10 @@ Napi::Value calculateNFP(const Napi::CallbackInfo& info) {
             Napi::Array child = Napi::Array::New(env);
             int z = 0;
             for (auto itr2 = (*itrh).begin(); itr2 != (*itrh).end(); ++itr2) {
-                Napi::Object c = Napi::Object::New(env);
-                c.Set("x", Napi::Number::New(env, ((double)(*itr2).x()) / inputscale + xshift));
-                c.Set("y", Napi::Number::New(env, ((double)(*itr2).y()) / inputscale + yshift));
-                child.Set(z, c);
+                Napi::Object localC = Napi::Object::New(env);
+                localC.Set("x", Napi::Number::New(env, ((double)(*itr2).x()) / inputscale + xshift));
+                localC.Set("y", Napi::Number::New(env, ((double)(*itr2).y()) / inputscale + yshift));
+                child.Set(z, localC);
                 z++;
             }
             children.Set(k, child);
