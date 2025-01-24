@@ -1,30 +1,22 @@
 const addon = require("./build/Release/addon.node")
 
-const A = {
-	points: [
-		{ x: 0, y: 0 },
-		{ x: 20, y: 0 },
-		{ x: 20, y: 20 },
-		{ x: 0, y: 20 }
-	],
-	children: [
-		[
-			{ x: 5, y: 5 },
-			{ x: 15, y: 5 },
-			{ x: 15, y: 15 },
-			{ x: 5, y: 15 }
-		]
-	]
-}
-
+const A = [
+	{ X: 0, Y: 0 },
+	{ X: 2, Y: 0 },
+	{ X: 2, Y: 3 },
+	{ X: 8, Y: 3 },
+	{ X: 8, Y: 0 },
+	{ X: 10, Y: 0 },
+	{ X: 10, Y: 5 },
+	{ X: 0, Y: 5 }
+]
 const B = [
-	{ x: 0, y: 0 },
-	{ x: 5, y: 0 },
-	{ x: 5, y: 5 },
-	{ x: 0, y: 5 }
+	{ X: 10, Y: 0 },
+	{ X: 15, Y: -5 },
+	{ X: 20, Y: 0 },
+	{ X: 15, Y: 5 }
 ]
 
-const hasHoles = true // Il poligono A ha un buco
+const hasHoles = false
 const nfps = addon.calculateNFP({ A: A, B: B, hasHoles: hasHoles })
-
 console.log(nfps)

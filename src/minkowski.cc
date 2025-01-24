@@ -89,8 +89,6 @@ void convolve_two_polygon_sets(polygon_set& result, const polygon_set& a, const 
   }
 }
 
-double inputscale;
-
 double calculateInputScale(const Napi::Array& A, const Napi::Array& B) {
     unsigned int len = A.Length();
     double Amaxx = 0;
@@ -161,7 +159,7 @@ Napi::Value calculateNFP(const Napi::CallbackInfo& info) {
   polygon_set a, b, c;
   std::vector<polygon> polys;
   std::vector<point> pts;
-  inputscale = calculateInputScale(A, B);
+  double inputscale = calculateInputScale(A, B);
 
   // Carica i punti di A
   for (unsigned int i = 0; i < A.Length(); i++) {
