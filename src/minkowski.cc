@@ -95,13 +95,6 @@ double inputscale;
 
 Napi::Value calculateNFP(const Napi::CallbackInfo& info) {
     Napi::Env env = info.Env();
-
-    // Verifica che ci siano abbastanza argomenti
-    if (info.Length() < 1 || !info[0].IsObject()) {
-        Napi::TypeError::New(env, "Un oggetto e' richiesto").ThrowAsJavaScriptException();
-        return env.Null();
-    }
-
     Napi::Object group = info[0].As<Napi::Object>();
     Napi::Array A = group.Get("A").As<Napi::Array>();
     Napi::Array B = group.Get("B").As<Napi::Array>();
