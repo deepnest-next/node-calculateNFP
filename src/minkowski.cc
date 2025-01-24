@@ -56,18 +56,20 @@ void convolve_two_point_sequences(polygon_set& result, itrT1 ab, itrT1 ae, itrT2
 }
 
 template <typename itrT>
-void convolve_point_sequence_with_polygons(polygon_set& result, itrT b, itrT e, const std::vector<polygon>& polygons) {
+void convolve_point_sequence_with_polygons(polygon_set& result, itrT b, itrT e, const std::vector<polygon>& polygons, bool& hasHoles) {
   using namespace boost::polygon;
   for (std::size_t i = 0; i < polygons.size(); ++i) {
     convolve_two_point_sequences(result, b, e, begin_points(polygons[i]), end_points(polygons[i]));
-    for (polygon_with_holes_traits<polygon>::iterator_holes_type itrh = begin_holes(polygons[i]);
-         itrh != end_holes(polygons[i]); ++itrh) {
-      convolve_two_point_sequences(result, b, e, begin_points(*itrh), end_points(*itrh));
+    if (hasHoles) {
+      for (polygon_with_holes_traits<polygon>::iterator_holes_type itrh = begin_holes(polygons[i]);
+          itrh != end_holes(polygons[i]); ++itrh) {
+        convolve_two_point_sequences(result, b, e, begin_points(*itrh), end_points(*itrh));
+      }
     }
   }
 }
 
-void convolve_two_polygon_sets(polygon_set& result, const polygon_set& a, const polygon_set& b) {
+void convolve_two_polygon_sets(polygon_set& result, const polygon_set& a, const polygon_set& b, bool& hasHoles) {
   using namespace boost::polygon;
   result.clear();
   std::vector<polygon> a_polygons;
@@ -75,12 +77,12 @@ void convolve_two_polygon_sets(polygon_set& result, const polygon_set& a, const 
   a.get(a_polygons);
   b.get(b_polygons);
   for (std::size_t ai = 0; ai < a_polygons.size(); ++ai) {
-    convolve_point_sequence_with_polygons(result, begin_points(a_polygons[ai]),
-                                          end_points(a_polygons[ai]), b_polygons);
-    for (polygon_with_holes_traits<polygon>::iterator_holes_type itrh = begin_holes(a_polygons[ai]);
-         itrh != end_holes(a_polygons[ai]); ++itrh) {
-      convolve_point_sequence_with_polygons(result, begin_points(*itrh),
-                                            end_points(*itrh), b_polygons);
+    convolve_point_sequence_with_polygons(result, begin_points(a_polygons[ai]), end_points(a_polygons[ai]), b_polygons, hasHoles);
+    if (hasHoles) {
+      for (polygon_with_holes_traits<polygon>::iterator_holes_type itrh = begin_holes(a_polygons[ai]);
+          itrh != end_holes(a_polygons[ai]); ++itrh) {
+        convolve_point_sequence_with_polygons(result, begin_points(*itrh), end_points(*itrh), b_polygons, hasHoles);
+      }
     }
     for (std::size_t bi = 0; bi < b_polygons.size(); ++bi) {
       polygon tmp_poly = a_polygons[ai];
@@ -92,6 +94,58 @@ void convolve_two_polygon_sets(polygon_set& result, const polygon_set& a, const 
 }
 
 double inputscale;
+
+double calculateInputScale(const Napi::Array& A, const Napi::Array& B) {
+    unsigned int len = A.Length();
+    double Amaxx = 0;
+    double Aminx = 0;
+    double Amaxy = 0;
+    double Aminy = 0;
+
+    for (unsigned int i = 0; i < len; i++) {
+        Napi::Object obj = A.Get(i).As<Napi::Object>();
+        double x = obj.Get("X").ToNumber().DoubleValue();
+        double y = obj.Get("Y").ToNumber().DoubleValue();
+
+        Amaxx = (std::max)(Amaxx, x);
+        Aminx = (std::min)(Aminx, x);
+        Amaxy = (std::max)(Amaxy, y);
+        Aminy = (std::min)(Aminy, y);
+    }
+
+    len = B.Length();
+    double Bmaxx = 0;
+    double Bminx = 0;
+    double Bmaxy = 0;
+    double Bminy = 0;
+
+    for (unsigned int i = 0; i < len; i++) {
+        Napi::Object obj = B.Get(i).As<Napi::Object>();
+        double x = obj.Get("X").ToNumber().DoubleValue();
+        double y = obj.Get("Y").ToNumber().DoubleValue();
+
+        Bmaxx = (std::max)(Bmaxx, x);
+        Bminx = (std::min)(Bminx, x);
+        Bmaxy = (std::max)(Bmaxy, y);
+        Bminy = (std::min)(Bminy, y);
+    }
+
+    double Cmaxx = Amaxx + Bmaxx;
+    double Cminx = Aminx + Bminx;
+    double Cmaxy = Amaxy + Bmaxy;
+    double Cminy = Aminy + Bminy;
+
+    double maxxAbs = (std::max)(Cmaxx, std::fabs(Cminx));
+    double maxyAbs = (std::max)(Cmaxy, std::fabs(Cminy));
+
+    double maxda = (std::max)(maxxAbs, maxyAbs);
+
+    if (maxda < 1) {
+        maxda = 1;
+    }
+
+    return ((0.1f * std::numeric_limits<int>::max()) / maxda);
+}
 
 Napi::Value calculateNFP(const Napi::CallbackInfo& info) {
   Napi::Env env = info.Env();
@@ -111,9 +165,7 @@ Napi::Value calculateNFP(const Napi::CallbackInfo& info) {
   polygon_set a, b, c;
   std::vector<polygon> polys;
   std::vector<point> pts;
-
-  double maxda = 1.0;
-  inputscale = (0.1 * std::numeric_limits<int>::max()) / maxda;
+  inputscale = calculateInputScale(A, B);
 
   // Carica i punti di A
   for (unsigned int i = 0; i < A.Length(); i++) {
@@ -162,7 +214,7 @@ Napi::Value calculateNFP(const Napi::CallbackInfo& info) {
 
   // Calcola la convoluzione
   polys.clear();
-  convolve_two_polygon_sets(c, a, b);
+  convolve_two_polygon_sets(c, a, b, hasHoles);
   c.get(polys);
 
   // Costruisci il risultato
@@ -173,8 +225,8 @@ Napi::Value calculateNFP(const Napi::CallbackInfo& info) {
 
     for (auto itr = polys[i].begin(); itr != polys[i].end(); ++itr) {
       Napi::Object p = Napi::Object::New(env);
-      p.Set("x", Napi::Number::New(env, ((double)(*itr).x()) / inputscale + xshift));
-      p.Set("y", Napi::Number::New(env, ((double)(*itr).y()) / inputscale + yshift));
+      p.Set("X", Napi::Number::New(env, ((double)(*itr).x()) / inputscale + xshift));
+      p.Set("Y", Napi::Number::New(env, ((double)(*itr).y()) / inputscale + yshift));
       pointlist.Set(j, p);
       j++;
     }
