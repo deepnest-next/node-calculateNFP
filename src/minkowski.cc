@@ -1,10 +1,6 @@
 #define BOOST_POLYGON_NO_DEPS
 
-#include <iostream>
-#include <string>
-#include <sstream>
 #include <limits>
-
 #include <napi.h>
 #include "polygon/polygon.hpp"
 
