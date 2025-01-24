@@ -103,30 +103,28 @@ Napi::Value calculateNFP(const Napi::CallbackInfo& info) {
     }
 
     Napi::Object group = info[0].As<Napi::Object>();
-    Napi::Object A = group.Get("A").As<Napi::Object>();
-    Napi::Array A_points = A.Get("points").As<Napi::Array>();
+    Napi::Array A = group.Get("A").As<Napi::Array>();
     Napi::Array B = group.Get("B").As<Napi::Array>();
 
     // Verifica se il poligono A ha buchi
     bool hasHoles = group.Get("hasHoles").ToBoolean();
     Napi::Array holes;
     if (hasHoles) {
-        holes = A.Get("children").As<Napi::Array>();
+        holes = group.Get("children").As<Napi::Array>();
     } else {
-        holes = Napi::Array::New(env); // Array vuoto se non ci sono buchi
+        holes = Napi::Array::New(env);
     }
 
     polygon_set a, b, c;
     std::vector<polygon> polys;
     std::vector<point> pts;
 
-    // Calcola inputscale
-    double maxda = 1.0; // Valore predefinito
+    double maxda = 1.0;
     inputscale = (0.1 * std::numeric_limits<int>::max()) / maxda;
 
     // Carica i punti di A
-    for (unsigned int i = 0; i < A_points.Length(); i++) {
-        Napi::Object obj = A_points.Get(i).As<Napi::Object>();
+    for (unsigned int i = 0; i < A.Length(); i++) {
+        Napi::Object obj = A.Get(i).As<Napi::Object>();
         int x = static_cast<int>(inputscale * obj.Get("X").ToNumber().DoubleValue());
         int y = static_cast<int>(inputscale * obj.Get("Y").ToNumber().DoubleValue());
         pts.push_back(point(x, y));
