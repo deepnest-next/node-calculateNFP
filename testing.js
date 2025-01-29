@@ -2,19 +2,20 @@ const addon = require("./build/Release/addon.node")
 
 const A = [
 	{ X: 0, Y: 0 },
-	{ X: 2, Y: 0 },
-	{ X: 2, Y: 3 },
-	{ X: 8, Y: 3 },
-	{ X: 8, Y: 0 },
-	{ X: 10, Y: 0 },
-	{ X: 10, Y: 5 },
-	{ X: 0, Y: 5 }
-]
-const B = [
-	{ X: 10, Y: 0 },
-	{ X: 15, Y: -5 },
 	{ X: 20, Y: 0 },
-	{ X: 15, Y: 5 }
+	{ X: 20, Y: 30 },
+	{ X: 80, Y: 30 },
+	{ X: 80, Y: 0 },
+	{ X: 100, Y: 0 },
+	{ X: 100, Y: 50 },
+	{ X: 0, Y: 50 }
+]
+
+const B = [
+	{ X: 100, Y: 0 },
+	{ X: 140, Y: -40 },
+	{ X: 180, Y: 0 },
+	{ X: 140, Y: 40 }
 ]
 
 const hasHoles = false

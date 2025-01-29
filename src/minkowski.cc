@@ -242,9 +242,8 @@ Napi::Value calculateNFP(const Napi::CallbackInfo& info) {
         children.Set(k, child);
         k++;
       }
+      pointlist.Set("children", children);
     }
-
-    pointlist.Set("children", children);
     result_list.Set(i, pointlist);
   }
 
