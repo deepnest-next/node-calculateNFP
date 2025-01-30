@@ -145,8 +145,7 @@ Napi::Value calculateNFP(const Napi::CallbackInfo& info) {
   std::vector<polygon> polys;
   std::vector<point> pts;
   double inputscale = calculateInputScale(aPoints, bPoints);
-  std::cout << "Input scale: " << inputscale << std::endl;
-
+  
   // Carica i punti di A
   for (unsigned int i = 0; i < aPoints.Length(); i++) {
     Napi::Object obj = aPoints.Get(i).As<Napi::Object>();
