@@ -1,23 +1,31 @@
 const addon = require("./build/Release/addon.node")
 
-const A = [
-	{ X: 0, Y: 0 },
-	{ X: 20, Y: 0 },
-	{ X: 20, Y: 30 },
-	{ X: 80, Y: 30 },
-	{ X: 80, Y: 0 },
-	{ X: 100, Y: 0 },
-	{ X: 100, Y: 50 },
-	{ X: 0, Y: 50 }
-]
+const A = {
+	points: [
+		{ X: 0, Y: 0 },
+		{ X: 100, Y: 0 },
+		{ X: 100, Y: 100 },
+		{ X: 0, Y: 100 }
+	],
+	children: [
+		[
+			{ X: 10, Y: 10 },
+			{ X: 30, Y: 10 },
+			{ X: 30, Y: 30 },
+			{ X: 10, Y: 30 },
+		]
+	]
+}
 
-const B = [
-	{ X: 100, Y: 0 },
-	{ X: 140, Y: -40 },
-	{ X: 180, Y: 0 },
-	{ X: 140, Y: 40 }
-]
+const B = {
+	points: [
+		{ X: 100, Y: 0 },
+		{ X: 150, Y: 0 },
+		{ X: 125, Y: 25 },
+	]
+}
 
-const hasHoles = false
-const nfps = addon.calculateNFP({ A: A, B: B, hasHoles: hasHoles })
-console.log(nfps)
+// A.children && A.children.length > 0
+const hasHoles = A.children && A.children.length > 0
+const nfps = addon.calculateNFP({ A: A, B: B, hasHoles: hasHoles });
+console.dir(nfps, { depth: null, colors: true })
