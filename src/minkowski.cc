@@ -139,7 +139,7 @@ Napi::Value calculateNFP(const Napi::CallbackInfo& info) {
     Napi::Array bPoints = B.Get("points").As<Napi::Array>();
     bool hasHoles = group.Has("hasHoles") && group.Get("hasHoles").ToBoolean().Value();
     Napi::Array holes = hasHoles && A.Has("children") ? A.Get("children").As<Napi::Array>() : Napi::Array::New(env);
-    
+
     polygon_set a, b, c;
     std::vector<polygon> polys;
     std::vector<point> pts;
@@ -196,7 +196,6 @@ Napi::Value calculateNFP(const Napi::CallbackInfo& info) {
     // Costruisci il risultato
     Napi::Array result_list = Napi::Array::New(env, polys.size());
     for (unsigned int i = 0; i < polys.size(); ++i) {
-        Napi::Object pathObj = Napi::Object::New(env);
         Napi::Array pointlist = Napi::Array::New(env);
         int j = 0;
         for (auto itr = polys[i].begin(); itr != polys[i].end(); ++itr) {
@@ -224,7 +223,7 @@ Napi::Value calculateNFP(const Napi::CallbackInfo& info) {
                 children.Set(k, child);
                 k++;
             }
-                pathObj.Set("children", children);
+            pointlist.Set("children", children);
         }
         result_list.Set(i, pointlist);
     }
