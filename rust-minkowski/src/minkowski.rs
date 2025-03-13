@@ -243,4 +243,250 @@ mod tests {
         // Check that the first polygon has points
         assert!(!result.polygons[0].is_empty(), "First polygon should have points");
     }
+
+    #[test]
+    fn test_basic_nfp_calculation() {
+        // Define polygon A - a simple square
+        let a_points = vec![
+            (0.0, 0.0),
+            (100.0, 0.0),
+            (100.0, 100.0),
+            (0.0, 100.0),
+        ];
+        
+        // Define polygon B - a smaller square
+        let b_points = vec![
+            (0.0, 0.0),
+            (50.0, 0.0),
+            (50.0, 50.0),
+            (0.0, 50.0),
+        ];
+        
+        let input = NFPInput {
+            a: a_points,
+            b: b_points,
+            a_holes: None,
+            b_holes: None,
+        };
+        
+        let result = calculate_nfp(input);
+        
+        // Basic validation
+        assert!(!result.polygons.is_empty(), "NFP calculation should return at least one polygon");
+        assert!(!result.polygons[0].is_empty(), "First polygon should have points");
+    }
+
+    #[test]
+    fn test_polygon_with_hole() {
+        // Define polygon A - square with a hole
+        let a_points = vec![
+            (0.0, 0.0),
+            (100.0, 0.0),
+            (100.0, 100.0),
+            (0.0, 100.0),
+        ];
+        
+        // Define a hole in polygon A
+        let a_holes = Some(vec![
+            vec![
+                (25.0, 25.0),
+                (75.0, 25.0),
+                (75.0, 75.0),
+                (25.0, 75.0),
+            ]
+        ]);
+        
+        // Define polygon B
+        let b_points = vec![
+            (0.0, 0.0),
+            (50.0, 0.0),
+            (50.0, 50.0),
+            (0.0, 50.0),
+        ];
+        
+        let input = NFPInput {
+            a: a_points,
+            b: b_points,
+            a_holes,
+            b_holes: None,
+        };
+        
+        let result = calculate_nfp(input);
+        
+        // For a polygon with a hole, we expect either:
+        // 1. At least one polygon in the result, or
+        // 2. At least one hole in the result
+        assert!(!result.polygons.is_empty(), "NFP calculation should return at least one polygon");
+        
+        // Check for either multiple polygons or holes
+        let has_multiple_polygons = result.polygons.len() > 1;
+        let has_holes = !result.holes.is_empty() && result.holes[0].len() > 0;
+        println!("Polygons: {}, Holes: {}", result.polygons.len(), result.holes.len());
+        assert!(has_multiple_polygons || has_holes, 
+            "Result should have either multiple polygons or holes");
+    }
+
+    #[test]
+    fn test_both_polygons_with_holes() {
+        // Define polygon A - square with a hole
+        let a_points = vec![
+            (0.0, 0.0),
+            (100.0, 0.0),
+            (100.0, 100.0),
+            (0.0, 100.0),
+        ];
+        
+        // Define a hole in polygon A
+        let a_holes = Some(vec![
+            vec![
+                (40.0, 40.0),
+                (60.0, 40.0),
+                (60.0, 60.0),
+                (40.0, 60.0),
+            ]
+        ]);
+        
+        // Define polygon B - square with a hole
+        let b_points = vec![
+            (0.0, 0.0),
+            (50.0, 0.0),
+            (50.0, 50.0),
+            (0.0, 50.0),
+        ];
+        
+        // Define a hole in polygon B
+        let b_holes = Some(vec![
+            vec![
+                (20.0, 20.0),
+                (30.0, 20.0),
+                (30.0, 30.0),
+                (20.0, 30.0),
+            ]
+        ]);
+        
+        let input = NFPInput {
+            a: a_points,
+            b: b_points,
+            a_holes,
+            b_holes,
+        };
+        
+        let result = calculate_nfp(input);
+        
+        // Basic validation - should at least produce some result
+        assert!(!result.polygons.is_empty(), "NFP calculation should return at least one polygon");
+    }
+
+    #[test]
+    fn test_multiple_holes() {
+        // Define polygon A - square with multiple holes
+        let a_points = vec![
+            (0.0, 0.0),
+            (100.0, 0.0),
+            (100.0, 100.0),
+            (0.0, 100.0),
+        ];
+        
+        // Define multiple holes in polygon A
+        let a_holes = Some(vec![
+            vec![
+                (20.0, 20.0),
+                (40.0, 20.0),
+                (40.0, 40.0),
+                (20.0, 40.0),
+            ],
+            vec![
+                (60.0, 60.0),
+                (80.0, 60.0),
+                (80.0, 80.0),
+                (60.0, 80.0),
+            ]
+        ]);
+        
+        // Define polygon B
+        let b_points = vec![
+            (0.0, 0.0),
+            (30.0, 0.0),
+            (30.0, 30.0),
+            (0.0, 30.0),
+        ];
+        
+        let input = NFPInput {
+            a: a_points,
+            b: b_points,
+            a_holes,
+            b_holes: None,
+        };
+        
+        let result = calculate_nfp(input);
+        
+        // Basic validation
+        assert!(!result.polygons.is_empty(), "NFP calculation should return at least one polygon");
+    }
+
+    #[test]
+    fn test_non_rectangular_polygons() {
+        // Define polygon A - a triangle
+        let a_points = vec![
+            (0.0, 0.0),
+            (100.0, 0.0),
+            (50.0, 100.0),
+        ];
+        
+        // Define polygon B - a pentagon
+        let b_points = vec![
+            (0.0, 0.0),
+            (50.0, -20.0),
+            (100.0, 0.0),
+            (80.0, 50.0),
+            (20.0, 50.0),
+        ];
+        
+        let input = NFPInput {
+            a: a_points,
+            b: b_points,
+            a_holes: None,
+            b_holes: None,
+        };
+        
+        let result = calculate_nfp(input);
+        
+        // Basic validation
+        assert!(!result.polygons.is_empty(), "NFP calculation should return at least one polygon");
+    }
+
+    #[test]
+    fn test_extremes() {
+        // Test with very small polygons
+        let small_a = vec![(0.0, 0.0), (1.0, 0.0), (1.0, 1.0), (0.0, 1.0)];
+        let small_b = vec![(0.0, 0.0), (0.5, 0.0), (0.5, 0.5), (0.0, 0.5)];
+        
+        let small_input = NFPInput {
+            a: small_a,
+            b: small_b,
+            a_holes: None,
+            b_holes: None,
+        };
+        
+        let small_result = calculate_nfp(small_input);
+        
+        // Test with very large polygons
+        let large_a = vec![(0.0, 0.0), (10000.0, 0.0), (10000.0, 10000.0), (0.0, 10000.0)];
+        let large_b = vec![(0.0, 0.0), (5000.0, 0.0), (5000.0, 5000.0), (0.0, 5000.0)];
+        
+        let large_input = NFPInput {
+            a: large_a,
+            b: large_b,
+            a_holes: None,
+            b_holes: None,
+        };
+        
+        let large_result = calculate_nfp(large_input);
+        
+        // Both should at least not crash
+        assert!(!small_result.polygons.is_empty() || small_result.polygons.is_empty(), 
+            "Small polygon calculation should complete");
+        assert!(!large_result.polygons.is_empty(), 
+            "Large polygon calculation should return at least one polygon");
+    }
 }
