@@ -13,7 +13,6 @@ $NodeVersion = &node -v
 [System.Environment]::SetEnvironmentVariable('ELECTRON_VERSION2', "34.3.0", [System.EnvironmentVariableTarget]::Process)
 
 npm install --arch=ia32
-
 npx prebuildify -t $env:NODE_VERSION -t $env:NODE_VERSION2 -t $env:NODE_VERSION3 -t electron@$env:ELECTRON_VERSION -t electron@$env:ELECTRON_VERSION2 --napi=false --tag-libc --strip -n calculateNfp --arch ia32
 npx prebuildify -t $env:NODE_VERSION -t $env:NODE_VERSION2 -t $env:NODE_VERSION3 -t electron@$env:ELECTRON_VERSION -t electron@$env:ELECTRON_VERSION2 --napi=true --tag-libc --strip -n calculateNfp --arch ia32
 

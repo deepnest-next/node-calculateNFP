@@ -41,8 +41,10 @@
         ],
         [
           'OS=="mac"', {
+            'cflags+': ['-fvisibility=hidden'],
             "xcode_settings": {
-              "GCC_ENABLE_CPP_EXCEPTIONS": "YES"
+              "GCC_ENABLE_CPP_EXCEPTIONS": "YES",
+              'GCC_SYMBOLS_PRIVATE_EXTERN': 'YES', # -fvisibility=hidden
             }
           }
         ]
@@ -52,6 +54,7 @@
         "./src/polygon/include"
       ],
       "dependencies": [
+        "<!(node -p \"require('node-addon-api').targets\"):node_addon_api_except_all",
         "<!(node -p \"require('node-addon-api').gyp\")"
       ]
     }

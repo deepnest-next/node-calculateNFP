@@ -232,36 +232,36 @@ Napi::Value CalculateNFP(const Napi::CallbackInfo& info) {
     Napi::Array pointlist = Napi::Array::New(env);
     int j = 0;
         
-    for(polygon_traits<polygon>::iterator_type itr = polys[i].begin(); itr != polys[i].end(); ++itr) {
+    for(boost::polygon::polygon_traits<polygon>::iterator_type itr = polys[i].begin(); itr != polys[i].end(); ++itr) {
        Napi::Object p = Napi::Object::New(env);
        p.Set("x", ((double)(*itr).get(boost::polygon::HORIZONTAL)) / inputscale + xshift);
        p.Set("y", ((double)(*itr).get(boost::polygon::VERTICAL)) / inputscale + yshift);
        
-       pointlist[j] = p;
+       pointlist.Set(j, p);
        j++;
     }
     
     // holes
     Napi::Array children = Napi::Array::New(env);
     int k = 0;
-    for(polygon_with_holes_traits<polygon>::iterator_holes_type itrh = begin_holes(polys[i]); itrh != end_holes(polys[i]); ++itrh){
+    for(boost::polygon::polygon_with_holes_traits<polygon>::iterator_holes_type itrh = begin_holes(polys[i]); itrh != end_holes(polys[i]); ++itrh){
       Napi::Array child = Napi::Array::New(env);
       int z = 0;
-      for(polygon_traits<polygon>::iterator_type itr2 = (*itrh).begin(); itr2 != (*itrh).end(); ++itr2) {
+      for(boost::polygon::polygon_traits<polygon>::iterator_type itr2 = (*itrh).begin(); itr2 != (*itrh).end(); ++itr2) {
         Napi::Object c = Napi::Object::New(env);
         c.Set("x", ((double)(*itr2).get(boost::polygon::HORIZONTAL)) / inputscale + xshift);
         c.Set("y", ((double)(*itr2).get(boost::polygon::VERTICAL)) / inputscale + yshift);
         
-        child[z] = c;
+        child.Set(z, c);
         z++;
       }
-      children[k] = child;
+      children.Set(k, child);
       k++;
     }
     
     pointlist.Set("children", children);
     
-    result_list[i] = pointlist;
+    result_list.Set(i, pointlist);
   }
   
   return result_list;  
