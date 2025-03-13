@@ -1,0 +1,24 @@
+[package]
+name = "deepnest-rust-minkowski"
+version = "0.1.0"
+edition = "2021"
+homepage = "https://www.deepnest.net"
+repository = "https://github.com/deepnest-next/node-calculateNFP"
+description = "A Rust library for Minkowski operations for deepnest"
+license = "BSL-1.0"
+authors = ["Deepnest Next <info@deepnest.net>"]
+keywords = ["deepnest", "nesting", "minkowski","no-fit-polygon", "nfp", "geometry"]
+categories = ["geometry", "nesting"]
+readme = "README.md"
+
+
+
+[lib]
+name = "deepnest_rust_minkowski"
+crate-type = ["staticlib", "rlib"]
+
+[dependencies]
+libc = "0.2"
+
+[build-dependencies]
+cc = "1"
