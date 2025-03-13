@@ -11,5 +11,4 @@ crate-type = ["staticlib", "rlib"]
 libc = "0.2"
 
 [build-dependencies]
-cbindgen = "0.28.0"
 cc = "1"
