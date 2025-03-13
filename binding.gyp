@@ -8,12 +8,17 @@
       "sources": ["src/addon.cc", "src/minkowski.cc"],
       "cflags!": ["-fno-exceptions"],
       "cflags_cc!": ["-fno-exceptions"],
-      "defines": ["NAPI_DISABLE_CPP_EXCEPTIONS"],
+      "defines": ["NAPI_DISABLE_CPP_EXCEPTIONS", "USE_NODE_API"],
       "conditions": [
         [
           'OS=="win"', {
             "msvs_version": 2022,
-            
+            "msvs_settings": {
+              "VCCLCompilerTool": {
+                "DisableSpecificWarnings": ["6323"],  # Suppress Boolean arithmetic warnings
+                "AdditionalOptions": ["/WX-"]  # Treat warnings as non-fatal
+              }
+            },
             "conditions": [
               [
                 'target_arch=="ia32"', {
@@ -51,7 +56,8 @@
       ],
       "include_dirs": [
         "<!@(node -p \"require('node-addon-api').include\")",
-        "./src/polygon/include"
+        "./src/polygon/include",
+        "./src"
       ],
       "dependencies": [
         "<!(node -p \"require('node-addon-api').targets\"):node_addon_api_except_all",

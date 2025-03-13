@@ -4,6 +4,7 @@
   "description": "C++ Addon for calculating NFP using by @deepnest-next/deepnest",
   "license": "MIT",
   "scripts": {
+    "test": "mocha test/**/*.test.js",
     "install": "node-gyp-build"
   },
   "repository": {
@@ -14,13 +15,17 @@
     "access": "public"
   },
   "keywords": [
-    "Electron",
+    "electron",
     "deepnest-next",
     "nfp",
     "node",
-    "Nesting",
-    "CNC",
-    "Laser"
+    "cnc",
+    "laser",
+    "nesting",
+    "optimization",
+    "geometry",
+    "NFP",
+    "no-fit polygon"
   ],
   "contributors": [
     {
@@ -33,6 +38,7 @@
     "node-gyp-build": "4.8.4"
   },
   "devDependencies": {
+    "mocha": "^10.0.0",
     "node-gyp": "11.1.0",
     "prebuildify": "6.0.1",
     "prebuildify-cross": "5.1.1"
@@ -46,5 +52,6 @@
       "type": "patreon",
       "url": "https://www.patreon.com/deepnest-next"
     }
-  ]
+  ],
+  "gypfile": true
 }
