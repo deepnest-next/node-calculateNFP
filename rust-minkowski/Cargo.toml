@@ -1,0 +1,14 @@
+[package]
+name = "rust-minkowski"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+name = "rust_minkowski"
+crate-type = ["staticlib", "rlib"]
+
+[dependencies]
+libc = "0.2"
+
+[build-dependencies]
+cbindgen = "0.28.0"
