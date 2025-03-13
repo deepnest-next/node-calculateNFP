@@ -1,19 +1,10 @@
-#include <nan.h>
-// #include "minkowski.h"
+#include <napi.h>
 
-using Nan::GetFunction;
-using Nan::New;
-using Nan::Set;
-using v8::FunctionTemplate;
-using v8::Local;
-using v8::Object;
-using v8::String;
+Napi::Value CalculateNFP(const Napi::CallbackInfo& info);
 
-NAN_METHOD(calculateNFP);
-
-NAN_MODULE_INIT(Init)
-{
-  Nan::SetMethod(target, "calculateNFP", calculateNFP);
+Napi::Object Init(Napi::Env env, Napi::Object exports) {
+  exports.Set("calculateNFP", Napi::Function::New(env, CalculateNFP));
+  return exports;
 }
 
-NAN_MODULE_WORKER_ENABLED(addon, Init)
+NODE_API_MODULE(addon, Init)
