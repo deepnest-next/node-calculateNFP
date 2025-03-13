@@ -1,6 +1,6 @@
 {
   "name": "@deepnest/calculate-nfp",
-  "version": "202502.27.164905",
+  "version": "202503.13.114354",
   "description": "C++ Addon for calculating NFP using by @deepnest-next/deepnest",
   "license": "MIT",
   "scripts": {
