@@ -3,6 +3,8 @@
 A C++ Node addon built with node-gyp and packaged with prebuildify (`build-*.sh` / `.ps1`).
 Boost.Polygon is vendored in `src/`, so no Boost install is needed.
 
+The npm package contains only `index.js` and the N-API prebuilds (`files` in `package.json`), no sources and no install script. One N-API binary per platform works for every Node and Electron version. A platform without a prebuild (e.g. musl, FreeBSD) gets "No native build was found" at runtime and has to build from this repository.
+
 ## External dependencies
 
 | Needed for | Debian/Ubuntu | Fedora | Alpine (musl) | macOS | Windows |
