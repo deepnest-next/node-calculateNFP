@@ -3,6 +3,10 @@ name: Build
 on:
   workflow_dispatch:
     inputs:
+      force:
+        description: "Build and publish even if the sources did not change (re-run after a failed release)"
+        type: boolean
+        default: false
       node_version:
         description: "Node.js Version"
         required: false
@@ -38,6 +42,10 @@ jobs:
       - name: Check for Existing SHASUM
         id: check-shasum
         run: |
+          if [ "${{ inputs.force }}" = "true" ]; then
+            echo "force: skipping the SHASUM check"
+            exit 1
+          fi
           if [ -f ./.last-shasum ]; then
             echo "Previous SHASUM exists."
             echo "------"
@@ -132,7 +140,8 @@ jobs:
           git config user.name "github-actions"
           git config user.email "actions@github.com"
           git add package.json .last-shasum
-          git commit -m "chore: update version to ${{ env.new_version }}"
+          # a re-run with the same version and sources has nothing to commit
+          git diff --cached --quiet || git commit -m "chore: update version to ${{ env.new_version }}"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -160,7 +169,6 @@ jobs:
             - Automatic prebuilds for all platforms and architectures that use the Node.js in version ${{ env.NODE_VERSION }} and Electron in version ${{ env.ELECTRON_VERSION }}.
           draft: false
           prerelease: false
-          token: ${{ secrets.PAT_TOKEN }}
           make_latest: true
           files: |
             prebuilds/*
