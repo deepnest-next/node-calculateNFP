@@ -105,6 +105,9 @@ jobs:
   update-version-and-release:
     needs: [compute-shasum, build]
     if: ${{ needs.compute-shasum.outputs.status == 'failure' && needs.build.result == 'success' }}
+    permissions:
+      contents: write
+      id-token: write # npm trusted publishing (OIDC), no NPM_TOKEN
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
@@ -173,5 +176,3 @@ jobs:
       - name: Publish Package
         if: github.ref == 'refs/heads/main'
         run: npm publish
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
