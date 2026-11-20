@@ -3,6 +3,10 @@
 A C++ Node addon built with node-gyp and packaged with prebuildify (`build-*.sh` / `.ps1`).
 Boost.Polygon is vendored in `src/`, so no Boost install is needed.
 
+The npm package contains only `index.js` and the N-API prebuilds (`files` in `package.json`), no sources and no install script. One N-API binary per platform works for every Node and Electron version.
+
+Supported platforms are exactly those Electron 45 ships for deepnest: macOS x64/arm64, Windows x64/arm64, Linux x64/arm64 (glibc). Platforms Electron does not support (musl/Alpine, FreeBSD, Windows ia32, Linux armv7l) get no prebuild and fail at runtime with "No native build was found".
+
 ## External dependencies
 
 | Needed for | Debian/Ubuntu | Fedora | Alpine (musl) | macOS | Windows |

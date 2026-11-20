@@ -3,9 +3,12 @@
   "version": "202503.13.155300",
   "description": "C++ Addon for calculating NFP using by @deepnest-next/deepnest",
   "license": "MIT",
+  "files": [
+    "index.js",
+    "prebuilds/"
+  ],
   "scripts": {
-    "test": "mocha test/**/*.test.js",
-    "install": "node-gyp-build"
+    "test": "mocha test/**/*.test.js"
   },
   "repository": {
     "type": "git",
@@ -52,6 +55,5 @@
       "type": "patreon",
       "url": "https://www.patreon.com/deepnest-next"
     }
-  ],
-  "gypfile": true
+  ]
 }
